@@ -1,0 +1,39 @@
+=== NAMESPACES - PROYECTO 6 ===
+NAME                 STATUS   AGE
+default              Active   2d8h
+kube-flannel         Active   2d7h
+kube-node-lease      Active   2d8h
+kube-public          Active   2d8h
+kube-system          Active   2d8h
+local-path-storage   Active   2d6h
+monitoring           Active   2d5h
+payments             Active   8h
+
+=== DEPLOYMENTS - PROYECTO 6 ===
+NAMESPACE            NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
+kube-system          coredns                               2/2     2            2           2d8h
+local-path-storage   local-path-provisioner                1/1     1            1           2d6h
+monitoring           monitoring-grafana                    1/1     1            1           2d5h
+monitoring           monitoring-kube-prometheus-operator   1/1     1            1           2d5h
+monitoring           monitoring-kube-state-metrics         1/1     1            1           2d5h
+payments             kubepay                               1/1     1            1           7h55m
+
+=== SERVICES - PROYECTO 6 ===
+NAMESPACE     NAME                                                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                        AGE
+default       kubernetes                                           ClusterIP   10.96.0.1        <none>        443/TCP                        2d8h
+kube-system   kube-dns                                             ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP         2d8h
+kube-system   monitoring-kube-prometheus-coredns                   ClusterIP   None             <none>        9153/TCP                       2d5h
+kube-system   monitoring-kube-prometheus-kube-controller-manager   ClusterIP   None             <none>        10257/TCP                      2d5h
+kube-system   monitoring-kube-prometheus-kube-etcd                 ClusterIP   None             <none>        2381/TCP                       2d5h
+kube-system   monitoring-kube-prometheus-kube-proxy                ClusterIP   None             <none>        10249/TCP                      2d5h
+kube-system   monitoring-kube-prometheus-kube-scheduler            ClusterIP   None             <none>        10259/TCP                      2d5h
+kube-system   monitoring-kube-prometheus-kubelet                   ClusterIP   None             <none>        10250/TCP,4194/TCP,10255/TCP   2d5h
+monitoring    alertmanager-operated                                ClusterIP   None             <none>        9093/TCP,9094/TCP,9094/UDP     2d5h
+monitoring    monitoring-grafana                                   ClusterIP   10.97.66.32      <none>        80/TCP                         2d5h
+monitoring    monitoring-kube-prometheus-alertmanager              ClusterIP   10.101.251.180   <none>        9093/TCP,8080/TCP              2d5h
+monitoring    monitoring-kube-prometheus-operator                  ClusterIP   10.109.130.116   <none>        443/TCP                        2d5h
+monitoring    monitoring-kube-prometheus-prometheus                ClusterIP   10.104.11.238    <none>        9090/TCP,8080/TCP              2d5h
+monitoring    monitoring-kube-state-metrics                        ClusterIP   10.111.12.1      <none>        8080/TCP                       2d5h
+monitoring    monitoring-prometheus-node-exporter                  ClusterIP   10.101.229.95    <none>        9100/TCP                       2d5h
+monitoring    prometheus-operated                                  ClusterIP   None             <none>        9090/TCP                       2d5h
+payments      kubepay                                              ClusterIP   10.110.100.110   <none>        8080/TCP                       7h55m

@@ -1,0 +1,38 @@
+=== MONITORING - PODS ===
+NAME                                                     READY   STATUS    RESTARTS       AGE    IP              NODE   NOMINATED NODE   READINESS GATES
+alertmanager-monitoring-kube-prometheus-alertmanager-0   2/2     Running   0              155m   10.244.1.36     w01    <none>           <none>
+monitoring-grafana-7b95775bcd-xkd7h                      3/3     Running   0              155m   10.244.1.33     w01    <none>           <none>
+monitoring-kube-prometheus-operator-7778cd678b-9zl88     1/1     Running   0              155m   10.244.1.32     w01    <none>           <none>
+monitoring-kube-state-metrics-5fc76fc67f-5s5lw           1/1     Running   4 (89m ago)    155m   10.244.1.34     w01    <none>           <none>
+monitoring-prometheus-node-exporter-zdkpm                1/1     Running   8 (162m ago)   2d5h   192.168.56.10   cp01   <none>           <none>
+monitoring-prometheus-node-exporter-zm4l9                1/1     Running   8 (148m ago)   2d5h   192.168.56.12   w02    <none>           <none>
+monitoring-prometheus-node-exporter-zvgmw                1/1     Running   9 (155m ago)   2d5h   192.168.56.11   w01    <none>           <none>
+prometheus-monitoring-kube-prometheus-prometheus-0       2/2     Running   0              155m   10.244.1.37     w01    <none>           <none>
+
+=== MONITORING - SERVICES ===
+NAME                                      TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE
+alertmanager-operated                     ClusterIP   None             <none>        9093/TCP,9094/TCP,9094/UDP   2d5h
+monitoring-grafana                        ClusterIP   10.97.66.32      <none>        80/TCP                       2d5h
+monitoring-kube-prometheus-alertmanager   ClusterIP   10.101.251.180   <none>        9093/TCP,8080/TCP            2d5h
+monitoring-kube-prometheus-operator       ClusterIP   10.109.130.116   <none>        443/TCP                      2d5h
+monitoring-kube-prometheus-prometheus     ClusterIP   10.104.11.238    <none>        9090/TCP,8080/TCP            2d5h
+monitoring-kube-state-metrics             ClusterIP   10.111.12.1      <none>        8080/TCP                     2d5h
+monitoring-prometheus-node-exporter       ClusterIP   10.101.229.95    <none>        9100/TCP                     2d5h
+prometheus-operated                       ClusterIP   None             <none>        9090/TCP                     2d5h
+
+=== MONITORING - SERVICEMONITORS ===
+NAME                                                 AGE
+kubepay                                              7h46m
+monitoring-grafana                                   2d5h
+monitoring-kube-prometheus-alertmanager              2d5h
+monitoring-kube-prometheus-apiserver                 2d5h
+monitoring-kube-prometheus-coredns                   2d5h
+monitoring-kube-prometheus-kube-controller-manager   2d5h
+monitoring-kube-prometheus-kube-etcd                 2d5h
+monitoring-kube-prometheus-kube-proxy                2d5h
+monitoring-kube-prometheus-kube-scheduler            2d5h
+monitoring-kube-prometheus-kubelet                   2d5h
+monitoring-kube-prometheus-operator                  2d5h
+monitoring-kube-prometheus-prometheus                2d5h
+monitoring-kube-state-metrics                        2d5h
+monitoring-prometheus-node-exporter                  2d5h

@@ -1,0 +1,233 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+
+metadata:
+  name: proyecto6-alert-rules
+  namespace: monitoring
+  labels:
+    release: monitoring
+    role: alert-rules
+    project: proyecto6
+
+spec:
+  groups:
+
+    # =========================================================
+    # INFRAESTRUCTURA
+    # =========================================================
+    - name: proyecto6.infrastructure
+      rules:
+
+        - alert: P6NodeDown
+          expr: up{job="node-exporter"} == 0
+          for: 1m
+          labels:
+            severity: critical
+            project: proyecto6
+          annotations:
+            summary: "Nodo {{ $labels.instance }} fuera de línea"
+            description: "node-exporter en {{ $labels.instance }} no responde durante al menos 1 minuto."
+            runbook: "docs/runbooks.md#1-p6nodedown"
+
+        - alert: P6HostHighCpuLoad
+          expr: |
+            100 * (
+              1 - avg by(instance) (
+                rate(
+                  node_cpu_seconds_total{
+                    job="node-exporter",
+                    mode="idle"
+                  }[5m]
+                )
+              )
+            ) > 80
+          for: 5m
+          labels:
+            severity: warning
+            project: proyecto6
+          annotations:
+            summary: "Uso elevado de CPU en {{ $labels.instance }}"
+            description: "El uso de CPU ha superado el 80% durante 5 minutos."
+            runbook: "docs/runbooks.md#2-p6hosthighcpuload"
+
+        - alert: P6HostMemoryPressure
+          expr: |
+            100 * (
+              1 -
+              node_memory_MemAvailable_bytes{job="node-exporter"}
+              /
+              node_memory_MemTotal_bytes{job="node-exporter"}
+            ) > 90
+          for: 5m
+          labels:
+            severity: warning
+            project: proyecto6
+          annotations:
+            summary: "Presión de memoria en {{ $labels.instance }}"
+            description: "El uso de memoria ha superado el 90% durante 5 minutos."
+            runbook: "docs/runbooks.md#3-p6hostmemorypressure"
+
+        - alert: P6DiskSpaceFillingUp
+          expr: |
+            100 * (
+              1 -
+              node_filesystem_avail_bytes{
+                job="node-exporter",
+                mountpoint="/",
+                fstype!~"tmpfs|overlay|squashfs"
+              }
+              /
+              node_filesystem_size_bytes{
+                job="node-exporter",
+                mountpoint="/",
+                fstype!~"tmpfs|overlay|squashfs"
+              }
+            ) > 85
+          for: 5m
+          labels:
+            severity: warning
+            project: proyecto6
+          annotations:
+            summary: "Uso elevado de disco en {{ $labels.instance }}"
+            description: "El sistema de archivos raíz supera el 85% de utilización durante 5 minutos."
+            runbook: "docs/runbooks.md#4-p6diskspacefillingup"
+
+        - alert: P6KubeletDown
+          expr: up{job="kubelet"} == 0
+          for: 1m
+          labels:
+            severity: critical
+            project: proyecto6
+          annotations:
+            summary: "Kubelet no disponible en {{ $labels.instance }}"
+            description: "Prometheus no puede recolectar métricas del kubelet durante al menos 1 minuto."
+            runbook: "docs/runbooks.md#5-p6kubeletdown"
+
+    # =========================================================
+    # KUBERNETES
+    # =========================================================
+    - name: proyecto6.kubernetes
+      rules:
+
+        - alert: P6PodCrashLooping
+          expr: |
+            (
+              max_over_time(
+                kube_pod_container_status_waiting_reason{
+                  reason="CrashLoopBackOff"
+                }[5m]
+              ) == 1
+            )
+            and on(namespace, pod, container)
+            (
+              increase(
+                kube_pod_container_status_restarts_total[10m]
+              ) >= 2
+            )
+          for: 30s
+          labels:
+            severity: warning
+            project: proyecto6
+          annotations:
+            summary: "Pod {{ $labels.pod }} en CrashLoopBackOff"
+            description: "El contenedor {{ $labels.container }} del Pod {{ $labels.pod }} presenta CrashLoopBackOff y múltiples reinicios recientes."
+            runbook: "docs/runbooks.md#6-p6podcrashlooping"
+
+        - alert: P6PodOOMKilled
+          expr: |
+            (
+              increase(
+                kube_pod_container_status_restarts_total[5m]
+              ) > 0
+            )
+            and on(namespace, pod, container)
+            (
+              kube_pod_container_status_last_terminated_reason{
+                reason="OOMKilled"
+              } == 1
+            )
+          for: 30s
+          labels:
+            severity: critical
+            project: proyecto6
+          annotations:
+            summary: "Contenedor terminado por OOMKilled"
+            description: "El contenedor {{ $labels.container }} del Pod {{ $labels.pod }} fue terminado por falta de memoria."
+            runbook: "docs/runbooks.md#7-p6podoomkilled"
+
+    # =========================================================
+    # KUBEPAY
+    # =========================================================
+    - name: proyecto6.kubepay
+      rules:
+
+        - alert: P6KubePayUnavailable
+          expr: up{job="kubepay"} == 0
+          for: 1m
+          labels:
+            severity: critical
+            project: proyecto6
+          annotations:
+            summary: "KubePay no está disponible"
+            description: "Prometheus no puede recolectar métricas del servicio KubePay durante al menos 1 minuto."
+            runbook: "docs/runbooks.md#8-p6kubepayunavailable"
+
+        - alert: P6KubePayHighDeclineRate
+          expr: |
+            (
+              100 *
+              sum(
+                increase(
+                  kubepay_payments_total{
+                    result="declined"
+                  }[5m]
+                )
+              )
+              /
+              clamp_min(
+                sum(
+                  increase(
+                    kubepay_payments_total[5m]
+                  )
+                ),
+                1
+              )
+            ) > 30
+            and
+            sum(
+              increase(
+                kubepay_payments_total[5m]
+              )
+            ) >= 5
+          for: 1m
+          labels:
+            severity: warning
+            project: proyecto6
+          annotations:
+            summary: "Alta tasa de pagos rechazados en KubePay"
+            description: "Más del 30% de los pagos procesados durante los últimos 5 minutos fueron rechazados, con al menos 5 transacciones observadas."
+            runbook: "docs/runbooks.md#9-p6kubepayhighdeclinerate"
+
+        - alert: P6KubePayReplicasMismatch
+          expr: |
+            max by(namespace, deployment) (
+              kube_deployment_status_replicas_available{
+                namespace="payments",
+                deployment="kubepay"
+              }
+            )
+            <
+            max by(namespace, deployment) (
+              kube_deployment_spec_replicas{
+                namespace="payments",
+                deployment="kubepay"
+              }
+            )
+          for: 1m
+          labels:
+            severity: warning
+            project: proyecto6
+          annotations:
+            summary: "Déficit de réplicas en KubePay"
+            description: "El número de réplicas disponibles de KubePay es inferior al número de réplicas deseadas."
+            runbook: "docs/runbooks.md#10-p6kubepayreplicasmismatch"

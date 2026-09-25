@@ -1,0 +1,23 @@
+NAMESPACE            NAME                                                     READY   STATUS    RESTARTS        AGE    IP              NODE   NOMINATED NODE   READINESS GATES
+kube-flannel         kube-flannel-ds-qqj97                                    1/1     Running   5 (142m ago)    2d7h   192.168.56.11   w01    <none>           <none>
+kube-flannel         kube-flannel-ds-rpwbj                                    1/1     Running   8 (148m ago)    2d7h   192.168.56.10   cp01   <none>           <none>
+kube-flannel         kube-flannel-ds-zls7k                                    1/1     Running   4 (134m ago)    2d7h   192.168.56.12   w02    <none>           <none>
+kube-system          coredns-66bc5c9577-672qs                                 1/1     Running   2 (148m ago)    30h    10.244.0.17     cp01   <none>           <none>
+kube-system          coredns-66bc5c9577-jpp2h                                 1/1     Running   2 (148m ago)    30h    10.244.0.16     cp01   <none>           <none>
+kube-system          etcd-cp01                                                1/1     Running   22 (148m ago)   2d8h   192.168.56.10   cp01   <none>           <none>
+kube-system          kube-apiserver-cp01                                      1/1     Running   0               76m    192.168.56.10   cp01   <none>           <none>
+kube-system          kube-controller-manager-cp01                             1/1     Running   1 (76m ago)     80m    192.168.56.10   cp01   <none>           <none>
+kube-system          kube-proxy-84rcf                                         1/1     Running   4 (142m ago)    2d7h   192.168.56.11   w01    <none>           <none>
+kube-system          kube-proxy-k4n8b                                         1/1     Running   5 (148m ago)    2d8h   192.168.56.10   cp01   <none>           <none>
+kube-system          kube-proxy-zhrh6                                         1/1     Running   3 (134m ago)    2d7h   192.168.56.12   w02    <none>           <none>
+kube-system          kube-scheduler-cp01                                      1/1     Running   1 (76m ago)     85m    192.168.56.10   cp01   <none>           <none>
+local-path-storage   local-path-provisioner-85b7f88cfc-bmhrf                  1/1     Running   0               141m   10.244.1.35     w01    <none>           <none>
+monitoring           alertmanager-monitoring-kube-prometheus-alertmanager-0   2/2     Running   0               141m   10.244.1.36     w01    <none>           <none>
+monitoring           monitoring-grafana-7b95775bcd-xkd7h                      3/3     Running   0               141m   10.244.1.33     w01    <none>           <none>
+monitoring           monitoring-kube-prometheus-operator-7778cd678b-9zl88     1/1     Running   0               141m   10.244.1.32     w01    <none>           <none>
+monitoring           monitoring-kube-state-metrics-5fc76fc67f-5s5lw           1/1     Running   4 (76m ago)     141m   10.244.1.34     w01    <none>           <none>
+monitoring           monitoring-prometheus-node-exporter-zdkpm                1/1     Running   8 (148m ago)    2d5h   192.168.56.10   cp01   <none>           <none>
+monitoring           monitoring-prometheus-node-exporter-zm4l9                1/1     Running   8 (134m ago)    2d5h   192.168.56.12   w02    <none>           <none>
+monitoring           monitoring-prometheus-node-exporter-zvgmw                1/1     Running   9 (142m ago)    2d5h   192.168.56.11   w01    <none>           <none>
+monitoring           prometheus-monitoring-kube-prometheus-prometheus-0       2/2     Running   0               141m   10.244.1.37     w01    <none>           <none>
+payments             kubepay-677bbf8b5b-px84b                                 1/1     Running   0               141m   10.244.2.4      w02    <none>           <none>

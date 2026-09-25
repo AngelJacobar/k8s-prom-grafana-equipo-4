@@ -1,0 +1,135 @@
+apiVersion: v1
+data:
+  server.py: |
+    import json
+    import time
+    import uuid
+    import threading
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+    lock = threading.Lock()
+    requests_total = {}
+    payments = {"approved": 0, "declined": 0}
+    duration_sum = 0.0
+    duration_count = 0
+
+    def count_request(method, path, status, duration):
+        global duration_sum, duration_count
+        key = (method, path, str(status))
+        with lock:
+            requests_total[key] = requests_total.get(key, 0) + 1
+            duration_sum += duration
+            duration_count += 1
+
+    class Handler(BaseHTTPRequestHandler):
+        def send_json(self, status, payload):
+            body = json.dumps(payload).encode()
+            self.send_response(status)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def do_GET(self):
+            start = time.time()
+
+            if self.path == "/healthz":
+                status = 200
+                self.send_json(status, {"status": "alive"})
+
+            elif self.path == "/readyz":
+                status = 200
+                self.send_json(status, {"status": "ready"})
+
+            elif self.path == "/metrics":
+                status = 200
+                lines = [
+                    "# HELP kubepay_up KubePay availability.",
+                    "# TYPE kubepay_up gauge",
+                    "kubepay_up 1",
+                    "# HELP kubepay_payments_total Simulated payments processed.",
+                    "# TYPE kubepay_payments_total counter",
+                    f'kubepay_payments_total{{result="approved"}} {payments["approved"]}',
+                    f'kubepay_payments_total{{result="declined"}} {payments["declined"]}',
+                    "# HELP kubepay_http_requests_total HTTP requests.",
+                    "# TYPE kubepay_http_requests_total counter",
+                ]
+
+                for (method, path, code), value in requests_total.items():
+                    lines.append(
+                        f'kubepay_http_requests_total{{method="{method}",path="{path}",status="{code}"}} {value}'
+                    )
+
+                lines.extend([
+                    "# HELP kubepay_request_duration_seconds Request processing time.",
+                    "# TYPE kubepay_request_duration_seconds summary",
+                    f"kubepay_request_duration_seconds_sum {duration_sum}",
+                    f"kubepay_request_duration_seconds_count {duration_count}",
+                ])
+
+                body = ("\n".join(lines) + "\n").encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/plain; version=0.0.4")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+
+            else:
+                status = 200
+                self.send_json(status, {
+                    "application": "KubePay",
+                    "version": "1.0",
+                    "message": "Simulated payment API"
+                })
+
+            count_request("GET", self.path, status, time.time() - start)
+
+        def do_POST(self):
+            start = time.time()
+
+            if self.path != "/api/v1/payments":
+                status = 404
+                self.send_json(status, {"error": "not found"})
+                count_request("POST", self.path, status, time.time() - start)
+                return
+
+            try:
+                length = int(self.headers.get("Content-Length", 0))
+                data = json.loads(self.rfile.read(length) or b"{}")
+
+                amount = float(data.get("amount", 0))
+                currency = str(data.get("currency", "")).upper()
+
+                approved = (
+                    amount > 0
+                    and amount <= 10000
+                    and currency in {"MXN", "USD", "EUR"}
+                )
+
+                result = "approved" if approved else "declined"
+
+                with lock:
+                    payments[result] += 1
+
+                status = 200
+                self.send_json(status, {
+                    "payment_id": str(uuid.uuid4()),
+                    "amount": amount,
+                    "currency": currency,
+                    "status": result
+                })
+
+            except Exception:
+                status = 400
+                self.send_json(status, {"error": "invalid request"})
+
+            count_request("POST", self.path, status, time.time() - start)
+
+        def log_message(self, format, *args):
+            print("%s - %s" % (self.address_string(), format % args))
+
+    ThreadingHTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
+kind: ConfigMap
+metadata:
+  name: kubepay-code
+  namespace: payments

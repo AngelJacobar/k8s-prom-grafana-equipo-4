@@ -1,0 +1,11 @@
+=== KUBEPAY - DEPLOYMENT ===
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE     CONTAINERS   IMAGES               SELECTOR
+kubepay   1/1     1            1           7h59m   kubepay      python:3.12-alpine   app=kubepay
+
+=== KUBEPAY - POD ===
+NAME                       READY   STATUS    RESTARTS   AGE    IP           NODE   NOMINATED NODE   READINESS GATES
+kubepay-677bbf8b5b-px84b   1/1     Running   0          151m   10.244.2.4   w02    <none>           <none>
+
+=== KUBEPAY - SERVICE ===
+NAME      TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+kubepay   ClusterIP   10.110.100.110   <none>        8080/TCP   7h59m

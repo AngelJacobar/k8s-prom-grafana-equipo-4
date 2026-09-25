@@ -1,0 +1,4 @@
+NAME   STATUS   ROLES           AGE    VERSION    INTERNAL-IP     EXTERNAL-IP   OS-IMAGE                      KERNEL-VERSION                 CONTAINER-RUNTIME
+cp01   Ready    control-plane   2d8h   v1.34.10   192.168.56.10   <none>        Rocky Linux 9.8 (Blue Onyx)   5.14.0-687.47.1.el9_8.x86_64   containerd://2.3.5
+w01    Ready    <none>          2d7h   v1.34.10   192.168.56.11   <none>        Rocky Linux 9.8 (Blue Onyx)   5.14.0-687.49.1.el9_8.x86_64   containerd://2.3.5
+w02    Ready    <none>          2d7h   v1.34.10   192.168.56.12   <none>        Rocky Linux 9.8 (Blue Onyx)   5.14.0-687.49.1.el9_8.x86_64   containerd://2.3.5
